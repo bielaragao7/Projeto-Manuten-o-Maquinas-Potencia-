@@ -9,19 +9,28 @@ from functools import wraps
 import csv, io, os, base64
 
 import qrcode
-import qrcode.image.svg  # <-- SVG (não precisa Pillow)
+import qrcode.image.svg  # SVG
 
+# =========================
+# CONFIGURAÇÃO BASE
+# =========================
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
-import os
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"),
+)
+
 app.secret_key = os.environ.get("SECRET_KEY", "dev")
 
 # --- QR Code (formulário do técnico) ---
 QR_PIN = os.environ.get("QR_PIN", "1234")
-# Base URL para gerar QR (use IP do PC/servidor), ex: http://192.168.1.163:5001
 BASE_URL = os.environ.get("BASE_URL", "").rstrip("/")
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# =========================
+# BANCO DE DADOS
+# =========================
 db_path = os.path.join(BASE_DIR, "manutencoes_v3.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
