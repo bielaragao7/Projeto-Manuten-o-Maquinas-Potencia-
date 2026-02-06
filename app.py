@@ -13,7 +13,8 @@ import qrcode.image.svg  # <-- SVG (não precisa Pillow)
 
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.secret_key = "troque_esta_chave_para_producao_v3"
+import os
+app.secret_key = os.environ.get("SECRET_KEY", "dev")
 
 # --- QR Code (formulário do técnico) ---
 QR_PIN = os.environ.get("QR_PIN", "1234")
