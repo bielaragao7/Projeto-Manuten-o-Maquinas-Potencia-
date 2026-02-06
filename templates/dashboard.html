@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Dashboard</h4>
+    <div class="small-muted">Filtros por mês/ano e setor.</div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label">Ano</label>
+        <input class="form-control" id="year" type="number" value="{{ now.year }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Mês</label>
+        <select class="form-select" id="month">
+          {% for m in range(1,13) %}
+            <option value="{{ m }}" {% if m==now.month %}selected{% endif %}>{{ "%02d"|format(m) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Setor</label>
+        <select class="form-select" id="setor">
+          <option value="">Todos</option>
+          {% for s in sectors %}
+            <option value="{{ s }}">{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4 d-flex gap-2">
+        <button class="btn btn-primary" id="btnCarregar">Carregar</button>
+        <a class="btn btn-outline-secondary" id="btnExport" href="#">Exportar Manutenções (CSV)</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Manutenções por Tipo</h6>
+        <canvas id="chartTipo" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Top Máquinas por Chamados</h6>
+        <canvas id="chartMaquinas" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-3">Problemas mais frequentes por máquina</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped" id="tblProblemas">
+            <thead>
+              <tr>
+                <th>Máquina</th>
+                <th>Top Problemas</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="small-muted">Dica: use os filtros acima e clique em “Carregar”.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+let chartTipo = null;
+let chartMaquinas = null;
+
+function getFilters() {
+  const year = document.getElementById('year').value;
+  const month = document.getElementById('month').value;
+  const setor = document.getElementById('setor').value;
+  return {year, month, setor};
+}
+
+function updateExportLink() {
+  const f = getFilters();
+  const params = new URLSearchParams();
+  if (f.year) params.set('year', f.year);
+  if (f.month) params.set('month', f.month);
+  if (f.setor) params.set('setor', f.setor);
+  document.getElementById('btnExport').href = "{{ url_for('export_manutencoes_csv') }}" + "?" + params.toString();
+}
+
+function renderCharts(data) {
+  // chartTipo
+  const labelsTipo = Object.keys(data.totals_tipo);
+  const valuesTipo = labelsTipo.map(k => data.totals_tipo[k]);
+
+  if (chartTipo) chartTipo.destroy();
+  chartTipo = new Chart(document.getElementById('chartTipo'), {
+    type: 'bar',
+    data: { labels: labelsTipo, datasets: [{ label: 'Chamados', data: valuesTipo }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+  // chartMaquinas (top 10)
+  const entries = Object.entries(data.totals_machine || {});
+  entries.sort((a,b) => b[1]-a[1]);
+  const top = entries.slice(0, 10);
+  const labelsM = top.map(x => x[0]);
+  const valuesM = top.map(x => x[1]);
+
+  if (chartMaquinas) chartMaquinas.destroy();
+  chartMaquinas = new Chart(document.getElementById('chartMaquinas'), {
+    type: 'bar',
+    data: { labels: labelsM, datasets: [{ label: 'Chamados', data: valuesM }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+  // problems table
+  const tbody = document.querySelector('#tblProblemas tbody');
+  tbody.innerHTML = '';
+  const problems = data.problems || {};
+  const machines = Object.keys(problems).sort();
+  machines.forEach(pat => {
+    const arr = problems[pat] || [];
+    const topText = arr.slice(0, 3).map(x => `${x.problema} (${x.count})`).join(' • ');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="badge text-bg-primary">${pat}</span></td><td>${topText || '-'}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadStats() {
+  const f = getFilters();
+  const params = new URLSearchParams();
+  if (f.year) params.set('year', f.year);
+  if (f.month) params.set('month', f.month);
+  if (f.setor) params.set('setor', f.setor);
+
+  updateExportLink();
+  const res = await fetch("{{ url_for('api_stats') }}" + "?" + params.toString());
+  const data = await res.json();
+  renderCharts(data);
+}
+
+document.getElementById('btnCarregar').addEventListener('click', loadStats);
+document.getElementById('year').addEventListener('change', updateExportLink);
+document.getElementById('month').addEventListener('change', updateExportLink);
+document.getElementById('setor').addEventListener('change', updateExportLink);
+
+// auto-load
+updateExportLink();
+loadStats();
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Listagem</h4>
+    <div class="small-muted">Gerencie o status dos chamados.</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Máquina</th>
+            <th>Problema</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Aberto por</th>
+            <th style="width:90px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in manutencoes %}
+          <tr>
+            <td>#{{ c.id }}</td>
+            <td><span class="badge text-bg-primary">{{ c.machine.patrimonio }}</span> <span class="text-muted ms-1">{{ c.machine.tipo }}</span></td>
+            <td>{{ c.problema }}</td>
+            <td>
+              <form class="d-flex gap-2" method="post" action="{{ url_for('update_status', id=c.id) }}">
+                <select class="form-select form-select-sm" name="status" style="width:160px">
+                  {% for s in ['Aberto','Em andamento','Concluído'] %}
+                    <option value="{{ s }}" {% if c.status==s %}selected{% endif %}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-success btn-sm">OK</button>
+              </form>
+            </td>
+            <td>{{ c.data_abertura.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ c.aberto_por or '-' }}</td>
+            <td></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if not manutencoes %}
+      <div class="alert alert-warning mb-0">Nenhum chamado.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

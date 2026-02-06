@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enviado!</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="alert alert-success">
+      <h4 class="alert-heading">Enviado com sucesso ✅</h4>
+      <p class="mb-0">Registro criado para a máquina <b>{{ machine.patrimonio }}</b> — {{ machine.nome }}.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div><b>Técnico:</b> {{ manutencao.aberto_por }}</div>
+        <div><b>Problema:</b> {{ manutencao.problema }}</div>
+        {% if manutencao.observacoes %}
+        <div><b>Obs:</b> {{ manutencao.observacoes }}</div>
+        {% endif %}
+        <div class="text-muted mt-2">Status: {{ manutencao.status }}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

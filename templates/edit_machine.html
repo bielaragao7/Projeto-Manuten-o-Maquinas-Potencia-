@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="mb-3">Editar máquina</h4>
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">Patrimônio</label>
+            <input class="form-control" name="patrimonio" value="{{ m.patrimonio }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" name="tipo" required>
+              {% for t in tipos %}
+                <option value="{{ t }}" {% if m.tipo==t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Setor</label>
+            <input class="form-control" name="setor" value="{{ m.setor or '' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status">
+              {% for s in ['Ativa','Em manutenção','Desativada'] %}
+                <option {% if m.status==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button class="btn btn-success">Salvar</button>
+          <a class="btn btn-link" href="{{ url_for('machines') }}">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

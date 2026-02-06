@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manutenção - {{ machine.patrimonio }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <div class="mb-3">
+      <h4>Formulário de manutenção</h4>
+      <div class="text-muted">
+        Máquina: <b>{{ machine.patrimonio }}</b> — {{ machine.nome }}
+        {% if machine.tipo %} ({{ machine.tipo }}){% endif %}
+        {% if machine.setor %} • Setor: {{ machine.setor }}{% endif %}
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} mb-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">PIN</label>
+            <input class="form-control" type="password" name="pin" placeholder="Digite o PIN" required>
+            <div class="form-text">PIN padrão: 1234 (você pode trocar no sistema).</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Nome do técnico</label>
+            <input class="form-control" name="tecnico" placeholder="Ex: João / Carlos" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Problema</label>
+            <select class="form-select" name="problema" required>
+              <option value="">-- selecione --</option>
+              {% for p in problemas %}
+                <option value="{{ p }}">{{ p }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control" name="observacoes" rows="4" placeholder="Detalhe o que foi encontrado / o que foi feito..."></textarea>
+          </div>
+
+          <button class="btn btn-primary">Enviar</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="text-muted small mt-3">
+      Este formulário envia os dados para o sistema interno.
+    </div>
+  </div>
+</body>
+</html>

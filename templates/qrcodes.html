@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* Ajustes gerais (tela) */
+  .qr-grid-print .card { height: 100%; }
+  .qr-grid-print .card-body { padding: 12px; }
+
+  /* ====== ESTILO DE IMPRESSÃO ====== */
+  @media print {
+    /* esconde coisas que não devem ir pro papel */
+    .no-print,
+    nav, .navbar, .sidebar, footer {
+      display: none !important;
+    }
+
+    /* reduz margens e deixa o A4 mais "cheio" */
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+
+    body {
+      margin: 0 !important;
+      background: #fff !important;
+    }
+
+    /* força as colunas do bootstrap virarem 2 por linha na impressão */
+    .qr-col-print {
+      width: 50% !important;      /* 2 por linha */
+      float: left !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    /* evita quebrar card no meio da página */
+    .card {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      border: 1px solid #000 !important;
+    }
+
+    /* tamanho do QR na impressão */
+    .qr-img {
+      max-width: 200px !important;
+    }
+
+    /* link fica mais legível no papel */
+    a[href]::after {
+      content: "" !important;
+    }
+  }
+</style>
+
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h4 class="mb-0">QR Codes por máquina</h4>
+
+  <!-- BOTÃO DE IMPRIMIR -->
+  <button class="btn btn-primary no-print" onclick="window.print()">
+    🖨️ Imprimir QR Codes
+  </button>
+</div>
+
+<p class="text-muted no-print">
+  Base usada nos QRs: <code>{{ base }}</code><br>
+  Dica: para funcionar no Wi-Fi da empresa, rode o sistema no PC/servidor da rede e defina a variável <code>BASE_URL</code>
+  com o IP dele (ex: <code>http://192.168.1.10:5001</code>).
+</p>
+
+<div class="row qr-grid-print">
+  {% for it in items %}
+  <div class="col-md-4 mb-4 qr-col-print">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title mb-1">{{ it.patrimonio }} - {{ it.nome }}</h6>
+        <div class="small text-muted mb-2">{{ it.tipo }}{% if it.setor %} • {{ it.setor }}{% endif %}</div>
+
+        <div class="text-center">
+          <img src="{{ it.qr }}" alt="QR {{ it.patrimonio }}" class="img-fluid qr-img" style="max-width: 220px;">
+        </div>
+
+        <!-- Na impressão, normalmente você não precisa do link (fica poluído).
+             Se quiser manter no papel, remova a classe no-print abaixo. -->
+        <div class="mt-2 no-print">
+          <div class="small"><a href="{{ it.url }}" target="_blank">{{ it.url }}</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
