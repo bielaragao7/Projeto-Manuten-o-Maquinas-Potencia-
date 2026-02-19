@@ -76,6 +76,42 @@ class Manutencao(db.Model):
     aberto_por = db.Column(db.String(80), nullable=True)
     machine = db.relationship("Machine", backref="manutencoes")
 
+@app.route("/admin/reset_maquinas_costura", methods=["GET"])
+def reset_maquinas_costura():
+    if session.get("role") != "admin":
+        return "Forbidden", 403
+
+    csv_path = os.path.join(BASE_DIR, "maquinas_costura_importar.csv")
+    if not os.path.exists(csv_path):
+        return "CSV não encontrado no servidor. Suba 'maquinas_costura_importar.csv' no GitHub.", 400
+
+    # apaga tudo
+    Manutencao.query.delete()
+    Machine.query.delete()
+    db.session.commit()
+
+    inserted = 0
+    seen = set()
+
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            patrimonio = (row.get("patrimonio") or "").strip()
+            tipo = (row.get("tipo") or "").strip()
+            setor = (row.get("setor") or "").strip()
+            status = (row.get("status") or "Ativa").strip()
+
+            if not patrimonio or patrimonio in seen:
+                continue
+            seen.add(patrimonio)
+
+            db.session.add(Machine(patrimonio=patrimonio, tipo=tipo, setor=setor, status=status))
+            inserted += 1
+
+    db.session.commit()
+    return f"OK! Reset feito. Máquinas importadas: {inserted}"
+
+
 
 # -------------------- AUTH HELPERS --------------------
 def is_logged_in():
