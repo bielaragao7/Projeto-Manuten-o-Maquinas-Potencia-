@@ -169,43 +169,7 @@ def create_tables_once():
         db.session.commit()
 
     # seed machines
-    if Machine.query.count() == 0:
-        demo_machines = [
-            ("OL-1001", "Overlock", "Preparação"),
-            ("OL-1002", "Overlock", "Preparação"),
-            ("GA-2001", "Galoneira", "Acabamento"),
-            ("TR-3001", "Travetadeira", "Costura"),
-            ("RT-4001", "Reta", "Costura"),
-            ("IN-5001", "Interlock", "Preparação"),
-        ]
-        for p, t, s in demo_machines:
-            db.session.add(Machine(patrimonio=p, tipo=t, setor=s, status="Ativa"))
-        db.session.commit()
-
-    # seed manutencoes
-    if Manutencao.query.count() == 0:
-        m1 = Machine.query.filter_by(patrimonio="OL-1001").first()
-        m2 = Machine.query.filter_by(patrimonio="OL-1002").first()
-        m3 = Machine.query.filter_by(patrimonio="GA-2001").first()
-        if m1 and m2 and m3:
-            demo = [
-                (m1.id, "Agulha quebrada", "joao"),
-                (m1.id, "Barulho estranho", "maria"),
-                (m2.id, "Agulha quebrada", "carlos"),
-                (m3.id, "Motor não liga", "ana"),
-            ]
-            for mid, prob, user in demo:
-                db.session.add(
-                    Manutencao(
-                        machine_id=mid,
-                        problema=prob,
-                        aberto_por=user,
-                        data_abertura=datetime.utcnow(),
-                        status="Aberto",
-                    )
-                )
-            db.session.commit()
-
+   
     _db_initialized = True
 
 
