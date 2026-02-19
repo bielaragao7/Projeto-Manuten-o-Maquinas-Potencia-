@@ -1,0 +1,180 @@
+﻿patrimonio,tipo,setor,status
+000085,RETA,Acabamento,Ativo
+000345,BOTONEIRA DE PRESSÃO,Acabamento,Ativo
+000339,BOTONEIRA DE PRESSÃO,Acabamento,Ativo
+000171,BOTONEIRA ELETRÔNICA,Acabamento,Ativo
+000122,TRAVETE,Acabamento,Ativo
+000078,BOTONEIRA,Acabamento,Ativo
+000035,CASEADEIRA,Acabamento,Ativo
+000034,TRAVETE,Acabamento,Ativo
+000033,BOTONEIRA DE PRESSÃO,Acabamento,Ativo
+000032,CASEADEIRA,Acabamento,Ativo
+000030,TRAVETE,Acabamento,Ativo
+000029,TRAVETE,Acabamento,Ativo
+000028,BOTONEIRA,Acabamento,Ativo
+000001,BOTONEIRA,Acabamento,Ativo
+000461,MAQUINA DE FURAR TECIDO,Corte,Ativo
+000458,MAQUINA DE FURAR TECIDO,Corte,Ativo
+000451,MAQUINA DE CORTAR TECIDO,Corte,Ativo
+000414,MAQUINA DE CORTAR TECIDO,Corte,Ativo
+000278,MAQUINA DE CORTAR TECIDO,Corte,Ativo
+000232,MAQUINA DE CORTAR TECIDO,Corte,Ativo
+000106,MAQUINA DE FURAR TECIDO,Corte,Ativo
+000105,"MAQUINA DE CORTAR TECIDO 8""",Corte,Ativo
+000044,GALONEIRA,Desenvolvimento De Produto,Ativo
+000140,PESPONTADEIRA,Desenvolvimento De Produto,Ativo
+000134,PESPONTADEIRA,Desenvolvimento De Produto,Ativo
+000097,RETA,Desenvolvimento De Produto,Ativo
+000091,INTERLOCK,Desenvolvimento De Produto,Ativo
+000069,FECHADEIRA,Desenvolvimento De Produto,Ativo
+000067,RETA,Desenvolvimento De Produto,Ativo
+000008,ELASTIQUEIRA,Desenvolvimento De Produto,Ativo
+000007,RETA,Desenvolvimento De Produto,Ativo
+000006,OVERLOCK PONTO CADEIA,Desenvolvimento De Produto,Ativo
+000004,OVERLOCK,Desenvolvimento De Produto,Ativo
+000002,MAQUINA DE CÓS,Desenvolvimento De Produto,Ativo
+000171,RETA,Preparação,Ativo
+000154,RETA,Preparação,Ativo
+000125,MAQUINA AUTOMÁTICA DE COSTURAR BOLSOS,Preparação,Ativo
+000123,INTERLOCK,Preparação,Ativo
+000089,PESPONTADEIRA,Preparação,Ativo
+000083,CASEADEIRA,Preparação,Ativo
+000076,PESPONTADEIRA,Preparação,Ativo
+000075,RETA,Preparação,Ativo
+000074,RETA,Preparação,Ativo
+000073,CASEADEIRA,Preparação,Ativo
+000071,OVERLOCK,Preparação,Ativo
+000222,MAQUINA DE REFLETIVO,Refletivo,Ativo
+000483,RETA,Refletivo,Ativo
+000213,MAQUINA DE REFLETIVO,Refletivo,Ativo
+000212,MAQUINA DE REFLETIVO,Refletivo,Ativo
+000068,MAQUINA DE REFLETIVO,Refletivo,Ativo
+000005,MAQUINA DE REFLETIVO,Refletivo,Ativo
+000064,RETA,Setor De Camisa,Ativo
+000187,RETA,Setor De Camisa,Ativo
+000185,INTERLOCK,Setor De Camisa,Ativo
+000152,RETA,Setor De Camisa,Ativo
+000131,INTERLOCK,Setor De Camisa,Ativo
+000130,RETA,Setor De Camisa,Ativo
+000129,RETA,Setor De Camisa,Ativo
+000128,RETA,Setor De Camisa,Ativo
+000127,RETA,Setor De Camisa,Ativo
+000121,PESPONTADEIRA,Setor De Camisa,Ativo
+000120,PRESPONTADEIRA,Setor De Camisa,Ativo
+000119,ELASTIQUEIRA,Setor De Camisa,Ativo
+000109,RETA,Setor De Camisa,Ativo
+000066,INTERLOCK,Setor De Camisa,Ativo
+000065,RETA,Setor De Camisa,Ativo
+000063,RETA,Setor De Camisa,Ativo
+000062,RETA,Setor De Camisa,Ativo
+000061,RETA,Setor De Camisa,Ativo
+000060,PESPONTADEIRA,Setor De Camisa,Ativo
+000059,RETA,Setor De Camisa,Ativo
+000058,RETA,Setor De Camisa,Ativo
+000057,ELASTIQUEIRA,Setor De Camisa,Ativo
+000056,PESPONTADEIRA,Setor De Camisa,Ativo
+000055,RETA,Setor De Camisa,Ativo
+000054,MAQUINA DE CÓS,Setor De Camisa,Ativo
+000053,OVERLOCK,Setor De Camisa,Ativo
+000052,RETA,Setor De Camisa,Ativo
+000051,RETA REFILADEIRA,Setor De Camisa,Ativo
+000050,RETA,Setor De Camisa,Ativo
+000049,INTERLOCK,Setor De Camisa,Ativo
+000048,OVERLOCK,Setor De Camisa,Ativo
+000047,OVERLOCK,Setor De Camisa,Ativo
+000046,RETA REFILADEIRA,Setor De Camisa,Ativo
+000150,GALONEIRA,Setor De Malha,Ativo
+000099,RETA,Setor De Malha,Ativo
+000072,RETA,Setor De Malha,Ativo
+000045,GALONEIRA,Setor De Malha,Ativo
+000027,OVERLOCK,Setor De Malha,Ativo
+000026,OVERLOCK,Setor De Malha,Ativo
+000025,OVERLOCK,Setor De Malha,Ativo
+000024,RETA,Setor De Malha,Ativo
+000023,CASEADEIRA,Setor De Malha,Ativo
+000244,FECHADEIRA,National,Ativo
+000017,OVERLOCK,Manutenção / Porão,Ativo
+000248,GALONEIRA,National,Ativo
+000022,RETA,Manutenção / Porão,Ativo
+000206,MAQUINA DE REFLETIVO,Manutenção / Porão,Ativo
+000021,MAQUINA DE REFLETIVO,National,Ativo
+000018,OVERLOCK,Manutenção / Porão,Ativo
+000246,FECHADEIRA,Manutenção / Porão,Ativo
+000009,ELASTIQUEIRA,Manutenção / Porão,Ativo
+000219,INTERLOCK,Manutenção / Porão,Ativo
+000217,ELASTIQUEIRA,Manutenção / Porão,Ativo
+000218,RETA,Manutenção / Porão,Ativo
+000464,FECHADEIRA,Manutenção / Porão,Ativo
+000080,RETA,Manutenção / Porão,Ativo
+000221,TRAVETE,Manutenção / Porão,Ativo
+000235,PRESPONTADEIRA,Manutenção / Porão,Ativo
+000243,OVERLOCK,National,Ativo
+000225,ELASTIQUEIRA,National,Ativo
+000215,MAQUINA DE CÓS,National,Ativo
+000231,FECHADEIRA,National,Ativo
+000211,FECHADEIRA,National,Ativo
+000242,RETA,National,Ativo
+000204,PRESPONTADEIRA,National,Ativo
+000209,PRESPONTADEIRA,National,Ativo
+000229,RETA,National,Ativo
+000230,RETA,National,Ativo
+000210,RETA,National,Ativo
+000216,FECHADEIRA,National,Ativo
+000400,INTERLOCK,National,Ativo
+000399,INTERLOCK,National,Ativo
+000398,PRESPONTADEIRA,National,Ativo
+000373,RETA,National,Ativo
+000397,PRESPONTADEIRA,National,Ativo
+000353,PRESPONTADEIRA,National,Ativo
+000354,PRESPONTADEIRA,National,Ativo
+000356,OVERLOCK,National,Ativo
+000355,RETA,National,Ativo
+000364,CASEADEIRA,National,Ativo
+000366,BOTONEIRA,National,Ativo
+000382,BOTONEIRA,National,Ativo
+000369,RETA,National,Ativo
+000374,TRAVETE,National,Ativo
+000377,TRAVETE,National,Ativo
+000375,TRAVETE,Manutenção / National,Ativo
+000368,RETA,Manutenção / National,Ativo
+000376,PRESPONTADEIRA,Manutenção / National,Ativo
+000248,RETA,Manutenção / National,Ativo
+000378,RETA,Manutenção / National,Ativo
+000283,PRESPONTADEIRA,Manutenção / National,Ativo
+000285,ELASTIQUEIRA,Manutenção / National,Ativo
+000300,ELASTIQUEIRA,Manutenção / National,Ativo
+000292,OVERLOCK,Manutenção / National,Ativo
+000299,FECHADEIRA,Manutenção / National,Ativo
+000272,TRAVETE,Manutenção / National,Ativo
+000271,PRESPONTADEIRA,Manutenção / National,Ativo
+000270,ELASTIQUEIRA,Manutenção / National,Ativo
+000282,ELASTIQUEIRA,Manutenção / National,Ativo
+000251,ELASTIQUEIRA,Manutenção / National,Ativo
+000253,INTERLOCK,Manutenção / National,Ativo
+000252,CASEADEIRA,Manutenção / National,Ativo
+000260,OVERLOCK,Manutenção / National,Ativo
+000261,ELASTIQUEIRA,Manutenção / National,Ativo
+000286,FECHADEIRA,Manutenção / National,Ativo
+000297,RETA,National,Ativo
+000298,MAQUINA DE CÓS,National,Ativo
+000290,PRESPONTADEIRA,National,Ativo
+000274,PRESPONTADEIRA,National,Ativo
+000289,RETA,National,Ativo
+000266,RETA,National,Ativo
+000262,OVERLOCK,National,Ativo
+000254,INTERLOCK,National,Ativo
+000259,FECHADEIRA,National,Ativo
+000264,PRESPONTADEIRA,National,Ativo
+000265,RETA,National,Ativo
+000257,OVERLOCK,National,Ativo
+000258,ELASTIQUEIRA,National,Ativo
+000279,MAQUINA DE REFLETIVO,National,Ativo
+000287,RETA,National,Ativo
+000484,RETA,Apiai,Ativo
+000485,RETA,Apiai,Ativo
+000486,RETA,Apiai,Ativo
+000487,RETA,Apiai,Ativo
+000488,RETA,Apiai,Ativo
+000489,RETA,Apiai,Ativo
+000490,RETA,Apiai,Ativo
+000491,RETA,Apiai,Ativo
