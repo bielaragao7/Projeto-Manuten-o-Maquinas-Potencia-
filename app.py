@@ -34,13 +34,21 @@ BASE_URL = os.environ.get("BASE_URL", "").rstrip("/")
 db_url = os.environ.get("DATABASE_URL")
 
 if db_url:
+    # Se vier como postgres:// (Render antigo)
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+    # Força usar psycopg v3 (senão tenta psycopg2)
+    if db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 else:
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///manutencoes_v3.db"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-
 PREDEFINED_TIPOS = ["Overlock", "Galoneira", "Travetadeira", "Reta", "Interlock"]
 PREDEFINED_PROBLEMAS = [
     "Agulha quebrada",
