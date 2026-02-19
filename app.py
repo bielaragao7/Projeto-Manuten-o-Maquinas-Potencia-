@@ -31,7 +31,12 @@ BASE_URL = os.environ.get("BASE_URL", "").rstrip("/")
 # =========================
 # BANCO DE DADOS
 # =========================
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////opt/render/project/src/manutencoes_v3.db'
+db_url = os.environ.get("DATABASE_URL")
+
+if db_url:
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///manutencoes_v3.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
