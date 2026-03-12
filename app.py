@@ -13,7 +13,15 @@ import csv, io, os, base64
 import qrcode
 import qrcode.image.svg  # SVG
 PREDEFINED_PROBLEMAS = [
-    # QR Codes que precisam ser impressos
+    "Agulha quebrada",
+    "Barulho estranho",
+    "Motor não liga",
+    "Ponto irregular",
+    "Manutenção preventiva",
+    "Alimentação de tecido irregular",
+]
+
+# QR Codes que precisam ser impressos
 QR_CODES_PARA_IMPRIMIR = [
     "000036","000133","000093","000092","000090",
     "000475","000236","000142","000141","000139",
