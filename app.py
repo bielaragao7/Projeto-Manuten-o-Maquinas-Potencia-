@@ -89,6 +89,74 @@ class Manutencao(db.Model):
     aberto_por = db.Column(db.String(80), nullable=True)
     machine = db.relationship("Machine", backref="manutencoes")
 
+
+# -------------------- SEED MAQUINAS QR --------------------
+def seed_qr_machines():
+    """
+    Cadastra as máquinas que precisam aparecer na tela de QR Codes.
+    Não duplica patrimônio já existente.
+    """
+    maquinas = [
+        ("000036", "Maquina de Arquear", "ACABAMENTO"),
+
+        ("000133", "Rebobinadora", "ALMOXARIFADO"),
+        ("000093", "Rebobinadora", "ALMOXARIFADO"),
+        ("000092", "Corte Fecho", "ALMOXARIFADO"),
+        ("000090", "Corte Fecho", "ALMOXARIFADO"),
+
+        ("000475", "Flash Cure", "ESTAMPARIA"),
+        ("000236", "Reveladora", "ESTAMPARIA"),
+        ("000142", "Soprador", "ESTAMPARIA"),
+        ("000141", "Soprador", "ESTAMPARIA"),
+        ("000139", "Soprador", "ESTAMPARIA"),
+        ("000099", "Flash Cure", "ESTAMPARIA"),
+
+        ("000195", "Bolso Social", "PREPARAÇÃO"),
+        ("000190", "Rainha", "PREPARAÇÃO"),
+        ("000117", "Reta", "PREPARAÇÃO"),
+        ("000132", "Entretela", "PREPARAÇÃO"),
+        ("000088", "Fusionadora", "PREPARAÇÃO"),
+        ("000086", "Vincar Bolso", "PREPARAÇÃO"),
+        ("000084", "Ferro", "PREPARAÇÃO"),
+        ("000082", "Filigrana", "PREPARAÇÃO"),
+        ("000081", "Aplicar Velcro", "PREPARAÇÃO"),
+        ("000080", "Reta", "PREPARAÇÃO"),
+
+        ("000126", "Vincar Bolso", "NATIONAL"),
+        ("000124", "Maquina", "NATIONAL"),
+        ("000089", "Pespontadeira", "NATIONAL"),
+        ("000021", "Refletivo", "NATIONAL"),
+        ("000224", "Passante", "NATIONAL"),
+        ("000243", "Overlock", "NATIONAL"),
+        ("000216", "Fechadeira", "NATIONAL"),
+        ("000114", "Ferro", "NATIONAL"),
+        ("000388", "Pregar Passante", "NATIONAL"),
+        ("000372", "Cortar Passante", "NATIONAL"),
+        ("000272", "Travete", "NATIONAL"),
+        ("000298", "Cos", "NATIONAL"),
+        ("000290", "Cos", "NATIONAL"),
+        ("000288", "Passar Bolso", "NATIONAL"),
+
+        ("000213", "Refletivo", "REFLETIVO"),
+        ("000070", "Prensa", "REFLETIVO"),
+
+        ("000017", "Overlock", "MANUTENÇÃO / PORÃO"),
+    ]
+
+    for p, t, s in maquinas:
+        if not Machine.query.filter_by(patrimonio=p).first():
+            db.session.add(
+                Machine(
+                    patrimonio=p,
+                    tipo=t,
+                    setor=s,
+                    status="Ativa"
+                )
+            )
+
+    db.session.commit()
+
+
 @app.route("/admin/reset_maquinas_costura", methods=["GET"])
 def reset_maquinas_costura():
     if session.get("role") != "admin":
@@ -123,7 +191,6 @@ def reset_maquinas_costura():
 
     db.session.commit()
     return f"OK! Reset feito. Máquinas importadas: {inserted}"
-
 
 
 # -------------------- AUTH HELPERS --------------------
@@ -182,7 +249,8 @@ def create_tables_once():
         db.session.commit()
 
     # seed machines
-   
+    seed_qr_machines()
+
     _db_initialized = True
 
 
@@ -458,7 +526,28 @@ def qrcodes():
     if current_user_role() != "admin":
         return redirect(url_for("index"))
 
-    machines = Machine.query.order_by(Machine.patrimonio.asc()).all()
+    ordem_setores = [
+        "ACABAMENTO",
+        "ALMOXARIFADO",
+        "ESTAMPARIA",
+        "PREPARAÇÃO",
+        "NATIONAL",
+        "REFLETIVO",
+        "MANUTENÇÃO / PORÃO",
+    ]
+
+    machines = Machine.query.all()
+
+    def chave_ordem(m):
+        setor = (m.setor or "").upper()
+        try:
+            idx = ordem_setores.index(setor)
+        except ValueError:
+            idx = 999
+        return (idx, setor, m.patrimonio)
+
+    machines = sorted(machines, key=chave_ordem)
+
     base = BASE_URL or request.url_root.rstrip("/")
 
     items = []
