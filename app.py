@@ -1,6 +1,7 @@
 from flask import (
     Flask, render_template, request, redirect, url_for,
     jsonify, session, make_response, flash
+
 )
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -8,8 +9,21 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import csv, io, os, base64
 
+
 import qrcode
 import qrcode.image.svg  # SVG
+PREDEFINED_PROBLEMAS = [
+    # QR Codes que precisam ser impressos
+QR_CODES_PARA_IMPRIMIR = [
+    "000036","000133","000093","000092","000090",
+    "000475","000236","000142","000141","000139",
+    "000099","000195","000190","000117","000132",
+    "000126","000124","000089","000088","000086",
+    "000084","000082","000081","000079","000213",
+    "000070","000017","000021","000080","000224",
+    "000243","000216","000114","000388","000372",
+    "000272","000298","000290","000288"
+]
 
 # =========================
 # CONFIGURAÇÃO BASE
@@ -565,6 +579,60 @@ def qrcodes():
         )
 
     return render_template("qrcodes.html", items=items, base=base, user=session.get("user"))
+    @app.route("/qrcodes-imprimir")
+@login_required
+def qrcodes_imprimir():
+
+    if current_user_role() != "admin":
+        return redirect(url_for("index"))
+
+    ordem_setores = [
+        "ACABAMENTO",
+        "ALMOXARIFADO",
+        "ESTAMPARIA",
+        "PREPARAÇÃO",
+        "NATIONAL",
+        "REFLETIVO",
+        "MANUTENÇÃO / PORÃO",
+    ]
+
+    machines = Machine.query.filter(
+        Machine.patrimonio.in_(QR_CODES_PARA_IMPRIMIR)
+    ).all()
+
+    def ordem(m):
+        setor = (m.setor or "").upper()
+        try:
+            idx = ordem_setores.index(setor)
+        except ValueError:
+            idx = 999
+        return (idx, setor, m.patrimonio)
+
+    machines = sorted(machines, key=ordem)
+
+    base = BASE_URL or request.url_root.rstrip("/")
+
+    items = []
+    for m in machines:
+        url = f"{base}/qr/{m.patrimonio}"
+
+        items.append(
+            {
+                "patrimonio": m.patrimonio,
+                "nome": m.patrimonio,
+                "tipo": m.tipo,
+                "setor": m.setor,
+                "url": url,
+                "qr": _qr_data_uri(url),
+            }
+        )
+
+    return render_template(
+        "qrcodes.html",
+        items=items,
+        base=base,
+        user=session.get("user"),
+    )
 
 
 @app.route("/qr/<patrimonio>", methods=["GET", "POST"])
