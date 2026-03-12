@@ -1,7 +1,6 @@
 from flask import (
     Flask, render_template, request, redirect, url_for,
     jsonify, session, make_response, flash
-
 )
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -9,28 +8,19 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import csv, io, os, base64
 
-
 import qrcode
 import qrcode.image.svg  # SVG
-PREDEFINED_PROBLEMAS = [
-    "Agulha quebrada",
-    "Barulho estranho",
-    "Motor não liga",
-    "Ponto irregular",
-    "Manutenção preventiva",
-    "Alimentação de tecido irregular",
-]
 
 # QR Codes que precisam ser impressos
 QR_CODES_PARA_IMPRIMIR = [
-    "000036","000133","000093","000092","000090",
-    "000475","000236","000142","000141","000139",
-    "000099","000195","000190","000117","000132",
-    "000126","000124","000089","000088","000086",
-    "000084","000082","000081","000079","000213",
-    "000070","000017","000021","000080","000224",
-    "000243","000216","000114","000388","000372",
-    "000272","000298","000290","000288"
+    "000036", "000133", "000093", "000092", "000090",
+    "000475", "000236", "000142", "000141", "000139",
+    "000099", "000195", "000190", "000117", "000132",
+    "000126", "000124", "000089", "000088", "000086",
+    "000084", "000082", "000081", "000079", "000213",
+    "000070", "000017", "000021", "000080", "000224",
+    "000243", "000216", "000114", "000388", "000372",
+    "000272", "000298", "000290", "000288"
 ]
 
 # =========================
@@ -71,6 +61,7 @@ else:
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+
 PREDEFINED_TIPOS = ["Overlock", "Galoneira", "Travetadeira", "Reta", "Interlock"]
 PREDEFINED_PROBLEMAS = [
     "Agulha quebrada",
@@ -578,19 +569,21 @@ def qrcodes():
         items.append(
             {
                 "patrimonio": m.patrimonio,
-                "nome": m.patrimonio,  # <-- FIX: não existe m.nome
+                "nome": m.patrimonio,
                 "tipo": m.tipo,
                 "setor": m.setor,
                 "url": url,
-                "qr": _qr_data_uri(url),  # SVG base64
+                "qr": _qr_data_uri(url),
             }
         )
 
     return render_template("qrcodes.html", items=items, base=base, user=session.get("user"))
-    @app.route("/qrcodes-imprimir")
+
+
+@app.route("/qrcodes-imprimir")
 @login_required
 def qrcodes_imprimir():
-
+    """Página com apenas os QR Codes que precisam ser impressos."""
     if current_user_role() != "admin":
         return redirect(url_for("index"))
 
