@@ -635,6 +635,41 @@ def qrcodes_imprimir():
         user=session.get("user"),
     )
 
+@app.route("/qrcodes-estamparia")
+@login_required
+def qrcodes_estamparia():
+    """Página com apenas os QR Codes da ESTAMPARIA."""
+    if current_user_role() != "admin":
+        return redirect(url_for("index"))
+
+    machines = Machine.query.filter(
+        Machine.setor == "ESTAMPARIA",
+        Machine.patrimonio.in_(QR_CODES_PARA_IMPRIMIR)
+    ).order_by(Machine.patrimonio.asc()).all()
+
+    base = BASE_URL or request.url_root.rstrip("/")
+
+    items = []
+    for m in machines:
+        url = f"{base}/qr/{m.patrimonio}"
+        items.append(
+            {
+                "patrimonio": m.patrimonio,
+                "nome": m.patrimonio,
+                "tipo": m.tipo,
+                "setor": m.setor,
+                "url": url,
+                "qr": _qr_data_uri(url),
+            }
+        )
+
+    return render_template(
+        "qrcodes.html",
+        items=items,
+        base=base,
+        user=session.get("user"),
+    )
+
 
 @app.route("/qr/<patrimonio>", methods=["GET", "POST"])
 def qr_form(patrimonio):
