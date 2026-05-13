@@ -23,9 +23,6 @@ QR_CODES_PARA_IMPRIMIR = [
     "000272", "000298", "000290", "000288"
 ]
 
-# =========================
-# CONFIGURAÇÃO BASE
-# =========================
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(
@@ -36,21 +33,15 @@ app = Flask(
 
 app.secret_key = os.environ.get("SECRET_KEY", "dev")
 
-# --- QR Code (formulário do técnico) ---
 QR_PIN = os.environ.get("QR_PIN", "1234")
 BASE_URL = os.environ.get("BASE_URL", "").rstrip("/")
 
-# =========================
-# BANCO DE DADOS
-# =========================
 db_url = os.environ.get("DATABASE_URL")
 
 if db_url:
-    # Se vier como postgres:// (Render antigo)
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-    # Força usar psycopg v3 (senão tenta psycopg2)
     if db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
@@ -63,6 +54,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 PREDEFINED_TIPOS = ["Overlock", "Galoneira", "Travetadeira", "Reta", "Interlock"]
+
 PREDEFINED_PROBLEMAS = [
     "Agulha quebrada",
     "Barulho estranho",
@@ -73,12 +65,11 @@ PREDEFINED_PROBLEMAS = [
 ]
 
 
-# -------------------- MODELS --------------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), default="factory")  # 'admin' or 'factory'
+    role = db.Column(db.String(20), default="factory")
 
     def check_password(self, pwd):
         return check_password_hash(self.password_hash, pwd)
@@ -89,7 +80,7 @@ class Machine(db.Model):
     patrimonio = db.Column(db.String(80), unique=True, nullable=False)
     tipo = db.Column(db.String(80), nullable=False)
     setor = db.Column(db.String(80), nullable=True)
-    status = db.Column(db.String(30), default="Ativa")  # Ativa, Em manutenção, Desativada
+    status = db.Column(db.String(30), default="Ativa")
 
 
 class Manutencao(db.Model):
@@ -97,18 +88,13 @@ class Manutencao(db.Model):
     machine_id = db.Column(db.Integer, db.ForeignKey("machine.id"), nullable=False)
     problema = db.Column(db.String(120), nullable=False)
     observacoes = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), default="Aberto")  # Aberto, Em andamento, Concluído
+    status = db.Column(db.String(20), default="Aberto")
     data_abertura = db.Column(db.DateTime, default=datetime.utcnow)
     aberto_por = db.Column(db.String(80), nullable=True)
     machine = db.relationship("Machine", backref="manutencoes")
 
 
-# -------------------- SEED MAQUINAS QR --------------------
 def seed_qr_machines():
-    """
-    Cadastra as máquinas que precisam aparecer na tela de QR Codes.
-    Não duplica patrimônio já existente.
-    """
     maquinas = [
         ("000036", "Maquina de Arquear", "ACABAMENTO"),
 
@@ -179,7 +165,6 @@ def reset_maquinas_costura():
     if not os.path.exists(csv_path):
         return "CSV não encontrado no servidor. Suba 'maquinas_costura_importar.csv' no GitHub.", 400
 
-    # apaga tudo
     Manutencao.query.delete()
     Machine.query.delete()
     db.session.commit()
@@ -197,16 +182,23 @@ def reset_maquinas_costura():
 
             if not patrimonio or patrimonio in seen:
                 continue
+
             seen.add(patrimonio)
 
-            db.session.add(Machine(patrimonio=patrimonio, tipo=tipo, setor=setor, status=status))
+            db.session.add(
+                Machine(
+                    patrimonio=patrimonio,
+                    tipo=tipo,
+                    setor=setor,
+                    status=status
+                )
+            )
             inserted += 1
 
     db.session.commit()
     return f"OK! Reset feito. Máquinas importadas: {inserted}"
 
 
-# -------------------- AUTH HELPERS --------------------
 def is_logged_in():
     return "user" in session
 
@@ -224,12 +216,7 @@ def login_required(f):
     return decorated_function
 
 
-# -------------------- QR (SEM PILLOW) --------------------
 def _qr_data_uri(url: str) -> str:
-    """
-    Gera QR em SVG (sem Pillow) e devolve data URI base64
-    para usar em <img src="...">.
-    """
     factory = qrcode.image.svg.SvgImage
     img = qrcode.make(url, image_factory=factory)
 
@@ -239,35 +226,37 @@ def _qr_data_uri(url: str) -> str:
     return f"data:image/svg+xml;base64,{b64}"
 
 
-# -------------------- INIT DB (Flask 3) --------------------
 _db_initialized = False
+
 
 @app.before_request
 def create_tables_once():
-    """
-    No Flask 3.x o before_first_request foi removido.
-    Rodamos uma vez usando flag.
-    """
     global _db_initialized
+
     if _db_initialized:
         return
 
     db.create_all()
 
-    # seed users
     if User.query.count() == 0:
-        admin = User(username="admin", password_hash=generate_password_hash("1234"), role="admin")
-        potencia = User(username="potencia", password_hash=generate_password_hash("2524"), role="factory")
+        admin = User(
+            username="admin",
+            password_hash=generate_password_hash("1234"),
+            role="admin"
+        )
+        potencia = User(
+            username="potencia",
+            password_hash=generate_password_hash("2524"),
+            role="factory"
+        )
         db.session.add_all([admin, potencia])
         db.session.commit()
 
-    # seed machines
     seed_qr_machines()
 
     _db_initialized = True
 
 
-# -------------------- ROUTES --------------------
 @app.route("/")
 def index():
     machines = (
@@ -276,6 +265,7 @@ def index():
         .order_by(Machine.tipo, Machine.patrimonio)
         .all()
     )
+
     return render_template(
         "index.html",
         machines=machines,
@@ -296,7 +286,11 @@ def login():
             session["role"] = u.role
             return redirect(url_for("dashboard") if u.role == "admin" else url_for("index"))
 
-        return render_template("login.html", error="Usuário ou senha inválidos", user=session.get("user"))
+        return render_template(
+            "login.html",
+            error="Usuário ou senha inválidos",
+            user=session.get("user")
+        )
 
     return render_template("login.html", user=session.get("user"))
 
@@ -324,8 +318,10 @@ def novo():
         status="Aberto",
         aberto_por=aberto_por,
     )
+
     db.session.add(m)
     db.session.commit()
+
     return redirect(url_for("index"))
 
 
@@ -356,6 +352,7 @@ def machines():
 
     maquinas = Machine.query.order_by(Machine.tipo, Machine.patrimonio).all()
     sectors = sorted({m.setor for m in maquinas if m.setor})
+
     return render_template(
         "machines.html",
         maquinas=maquinas,
@@ -371,15 +368,22 @@ def edit_machine(id):
         return redirect(url_for("login"))
 
     m = Machine.query.get_or_404(id)
+
     if request.method == "POST":
         m.patrimonio = (request.form.get("patrimonio") or "").strip()
         m.tipo = request.form.get("tipo")
         m.setor = (request.form.get("setor") or "").strip() or None
         m.status = request.form.get("status") or "Ativa"
         db.session.commit()
+
         return redirect(url_for("machines"))
 
-    return render_template("edit_machine.html", m=m, tipos=PREDEFINED_TIPOS, user=session.get("user"))
+    return render_template(
+        "edit_machine.html",
+        m=m,
+        tipos=PREDEFINED_TIPOS,
+        user=session.get("user")
+    )
 
 
 @app.route("/list")
@@ -388,7 +392,12 @@ def listagem():
         return redirect(url_for("login"))
 
     manut = Manutencao.query.order_by(Manutencao.data_abertura.desc()).all()
-    return render_template("listagem.html", manutencoes=manut, user=session.get("user"))
+
+    return render_template(
+        "listagem.html",
+        manutencoes=manut,
+        user=session.get("user")
+    )
 
 
 @app.route("/update_status/<int:id>", methods=["POST"])
@@ -398,6 +407,7 @@ def update_status(id):
 
     novo_status = request.form.get("status")
     m = Manutencao.query.get_or_404(id)
+
     if novo_status in ["Aberto", "Em andamento", "Concluído"]:
         m.status = novo_status
         db.session.commit()
@@ -412,6 +422,7 @@ def dashboard():
 
     sectors = sorted({m.setor for m in Machine.query.all() if m.setor})
     now = datetime.now()
+
     return render_template(
         "dashboard.html",
         tipos=PREDEFINED_TIPOS,
@@ -439,23 +450,46 @@ def api_stats():
         end = datetime(year + 1, 1, 1) if month == 12 else datetime(year, month + 1, 1)
         q = q.filter(Manutencao.data_abertura >= start, Manutencao.data_abertura < end)
 
-    totals_tipo = q.with_entities(Machine.tipo, func.count(Manutencao.id)).group_by(Machine.tipo).all()
+    totals_tipo = (
+        q.with_entities(Machine.tipo, func.count(Manutencao.id))
+        .group_by(Machine.tipo)
+        .all()
+    )
     totals_tipo_dict = {t: c for t, c in totals_tipo}
 
-    totals_machine = q.with_entities(Machine.patrimonio, func.count(Manutencao.id)).group_by(Machine.patrimonio).all()
+    totals_machine = (
+        q.with_entities(Machine.patrimonio, func.count(Manutencao.id))
+        .group_by(Machine.patrimonio)
+        .all()
+    )
     totals_machine_dict = {p: c for p, c in totals_machine}
 
     problems = (
-        q.with_entities(Machine.patrimonio, Manutencao.problema, func.count(Manutencao.id))
+        q.with_entities(
+            Machine.patrimonio,
+            Manutencao.problema,
+            func.count(Manutencao.id)
+        )
         .group_by(Machine.patrimonio, Manutencao.problema)
         .all()
     )
 
     problems_dict = {}
+
     for p, prob, c in problems:
-        problems_dict.setdefault(p, []).append({"problema": prob, "count": c})
+        problems_dict.setdefault(p, []).append(
+            {
+                "problema": prob,
+                "count": c
+            }
+        )
+
     for p in problems_dict:
-        problems_dict[p] = sorted(problems_dict[p], key=lambda x: x["count"], reverse=True)
+        problems_dict[p] = sorted(
+            problems_dict[p],
+            key=lambda x: x["count"],
+            reverse=True
+        )
 
     return jsonify(
         {
@@ -473,6 +507,7 @@ def export_machines_csv():
 
     sector = request.args.get("setor")
     q = Machine.query
+
     if sector:
         q = q.filter(Machine.setor == sector)
 
@@ -481,12 +516,14 @@ def export_machines_csv():
     si = io.StringIO()
     cw = csv.writer(si)
     cw.writerow(["patrimonio", "tipo", "setor", "status"])
+
     for it in items:
         cw.writerow([it.patrimonio, it.tipo, it.setor or "", it.status])
 
     output = make_response(si.getvalue())
     output.headers["Content-Disposition"] = "attachment; filename=machines.csv"
     output.headers["Content-type"] = "text/csv; charset=utf-8"
+
     return output
 
 
@@ -500,8 +537,10 @@ def export_manutencoes_csv():
     setor = request.args.get("setor", type=str)
 
     q = Manutencao.query.join(Machine)
+
     if setor:
         q = q.filter(Machine.setor == setor)
+
     if year and month:
         start = datetime(year, month, 1)
         end = datetime(year + 1, 1, 1) if month == 12 else datetime(year, month + 1, 1)
@@ -511,31 +550,45 @@ def export_manutencoes_csv():
 
     si = io.StringIO()
     cw = csv.writer(si)
-    cw.writerow(["id", "patrimonio", "tipo", "setor", "problema", "observacoes", "status", "data_abertura", "aberto_por"])
+    cw.writerow(
+        [
+            "id",
+            "patrimonio",
+            "tipo",
+            "setor",
+            "problema",
+            "observacoes",
+            "status",
+            "data_abertura",
+            "aberto_por"
+        ]
+    )
+
     for it in items:
-        cw.writerow([
-            it.id,
-            it.machine.patrimonio,
-            it.machine.tipo,
-            it.machine.setor or "",
-            it.problema,
-            it.observacoes or "",
-            it.status,
-            it.data_abertura.isoformat(),
-            it.aberto_por or "",
-        ])
+        cw.writerow(
+            [
+                it.id,
+                it.machine.patrimonio,
+                it.machine.tipo,
+                it.machine.setor or "",
+                it.problema,
+                it.observacoes or "",
+                it.status,
+                it.data_abertura.isoformat(),
+                it.aberto_por or "",
+            ]
+        )
 
     output = make_response(si.getvalue())
     output.headers["Content-Disposition"] = "attachment; filename=manutencoes.csv"
     output.headers["Content-type"] = "text/csv; charset=utf-8"
+
     return output
 
 
-# -------------------- QR PAGES --------------------
 @app.route("/qrcodes")
 @login_required
 def qrcodes():
-    """Página para admin imprimir/baixar os QRs por máquina."""
     if current_user_role() != "admin":
         return redirect(url_for("index"))
 
@@ -553,19 +606,22 @@ def qrcodes():
 
     def chave_ordem(m):
         setor = (m.setor or "").upper()
+
         try:
             idx = ordem_setores.index(setor)
         except ValueError:
             idx = 999
+
         return (idx, setor, m.patrimonio)
 
     machines = sorted(machines, key=chave_ordem)
-
     base = BASE_URL or request.url_root.rstrip("/")
 
     items = []
+
     for m in machines:
         url = f"{base}/qr/{m.patrimonio}"
+
         items.append(
             {
                 "patrimonio": m.patrimonio,
@@ -577,13 +633,17 @@ def qrcodes():
             }
         )
 
-    return render_template("qrcodes.html", items=items, base=base, user=session.get("user"))
+    return render_template(
+        "qrcodes.html",
+        items=items,
+        base=base,
+        user=session.get("user")
+    )
 
 
 @app.route("/qrcodes-imprimir")
 @login_required
 def qrcodes_imprimir():
-    """Página com apenas os QR Codes que precisam ser impressos."""
     if current_user_role() != "admin":
         return redirect(url_for("index"))
 
@@ -603,17 +663,19 @@ def qrcodes_imprimir():
 
     def ordem(m):
         setor = (m.setor or "").upper()
+
         try:
             idx = ordem_setores.index(setor)
         except ValueError:
             idx = 999
+
         return (idx, setor, m.patrimonio)
 
     machines = sorted(machines, key=ordem)
-
     base = BASE_URL or request.url_root.rstrip("/")
 
     items = []
+
     for m in machines:
         url = f"{base}/qr/{m.patrimonio}"
 
@@ -635,23 +697,29 @@ def qrcodes_imprimir():
         user=session.get("user"),
     )
 
+
 @app.route("/qrcodes-estamparia")
 @login_required
 def qrcodes_estamparia():
-    """Página com apenas os QR Codes da ESTAMPARIA."""
     if current_user_role() != "admin":
         return redirect(url_for("index"))
 
-    machines = Machine.query.filter(
-        Machine.setor == "ESTAMPARIA",
-        Machine.patrimonio.in_(QR_CODES_PARA_IMPRIMIR)
-    ).order_by(Machine.patrimonio.asc()).all()
+    machines = (
+        Machine.query
+        .filter(
+            Machine.setor == "ESTAMPARIA",
+            Machine.patrimonio.in_(QR_CODES_PARA_IMPRIMIR)
+        )
+        .order_by(Machine.patrimonio.asc())
+        .all()
+    )
 
     base = BASE_URL or request.url_root.rstrip("/")
-
     items = []
+
     for m in machines:
         url = f"{base}/qr/{m.patrimonio}"
+
         items.append(
             {
                 "patrimonio": m.patrimonio,
@@ -673,13 +741,14 @@ def qrcodes_estamparia():
 
 @app.route("/qr/<patrimonio>", methods=["GET", "POST"])
 def qr_form(patrimonio):
-    """Formulário simples para o técnico via QR (sem login)."""
     machine = Machine.query.filter_by(patrimonio=patrimonio).first()
+
     if not machine:
         return "Máquina não encontrada", 404
 
     if request.method == "POST":
         pin = (request.form.get("pin") or "").strip()
+
         if pin != QR_PIN:
             flash("PIN incorreto.", "danger")
             return redirect(url_for("qr_form", patrimonio=patrimonio))
@@ -699,12 +768,29 @@ def qr_form(patrimonio):
             status="Aberto",
             aberto_por=tecnico,
         )
+
         db.session.add(m)
         db.session.commit()
 
-        return render_template("qr_sucesso.html", machine=machine, manutencao=m)
+        return render_template(
+            "qr_sucesso.html",
+            machine=machine,
+            manutencao=m
+        )
 
-    return render_template("qr_form.html", machine=machine, problemas=PREDEFINED_PROBLEMAS)
+    return render_template(
+        "qr_form.html",
+        machine=machine,
+        problemas=PREDEFINED_PROBLEMAS
+    )
+
+
+# =========================
+# CARTÃO DIGITAL
+# =========================
+@app.route("/cartao")
+def cartao():
+    return render_template("cartao.html")
 
 
 if __name__ == "__main__":
